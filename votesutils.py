@@ -34,4 +34,12 @@ def get_votos(json_data):
 
 
 def get_title(json_data):
-    return json_data["informacion"]["textoExpediente"]
+    return __get_json_attribute(json_data, "textoExpediente")
+
+
+def get_subtitle(json_data):
+    return __get_json_attribute(json_data, "textoSubGrupo")
+
+
+def __get_json_attribute(json_data, attribute):
+    return json_data["informacion"][attribute]
