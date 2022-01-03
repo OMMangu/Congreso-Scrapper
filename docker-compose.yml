@@ -11,7 +11,6 @@ services:
       - MONGO_INITDB_ROOT_USERNAME=test
       - MONGO_INITDB_ROOT_PASSWORD=test1
     volumes:
-      - dbdata:/data/db
+      - ~/volumes/scrapper:/data/db
 volumes:
   dbdata:
-  node_modules:
