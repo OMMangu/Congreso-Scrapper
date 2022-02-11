@@ -41,5 +41,25 @@ def get_subtitle(json_data):
     return __get_json_attribute(json_data, "textoSubGrupo")
 
 
+def get_sesion(json_data):
+    return __get_json_attribute(json_data, "sesion")
+
+
+def get_num_votacion(json_data):
+    return __get_json_attribute(json_data, "numeroVotacion")
+
+
+def get_record_text(json_data):
+    return __get_json_attribute(json_data, "textoExpediente")
+
+
+def get_subgroup(json_data):
+    return __get_json_attribute(json_data, "textoSubGrupo")
+
+
+def get_detailed_vote(json_data):
+    return json_data["votaciones"]
+
+
 def __get_json_attribute(json_data, attribute):
     return json_data["informacion"][attribute]

@@ -1,7 +1,18 @@
 version: '3'
 services:
+  postgresql:
+    image: postgres:latest
+    restart: unless-stopped
+    container_name: postgre
+    volumes:
+      - ~/volumes/scrapper-pg:/var/lib/postgresql/data
+      - ./docker_postgres_init.sql:/docker-entrypoint-initdb.d/docker_postgres_init.sql
+    environment:
+      - POSTGRES_PASSWORD=test1
+    ports:
+      - '5432:5432'
   mongodb:
-#    TODO Use proper pwd handling
+    #    TODO Use proper pwd handling
     image: mongo:4.4.6
     ports:
       - 27017:27017

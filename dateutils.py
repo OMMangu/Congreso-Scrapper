@@ -9,6 +9,7 @@ def get_date(json_data):
 def format_date(date):
     return datetime.datetime.strptime(date, '%d/%m/%Y').strftime('%d-%m-%Y')
 
+
 def is_final_date(d):
     if d.day == 1 and d.month == 1 and d.year == 2019:
         return True
