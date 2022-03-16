@@ -1,36 +1,40 @@
 CREATE TABLE IF NOT EXISTS sesion(
     id serial primary key,
-    sesion_number int
+    sesion_number int8 UNIQUE
 );
-CREATE TABLE IF NOT EXISTS votacion(
-    id serial primary key,
-    sesion_id int not null,
-    votacion_number int not null,
-    fecha date not null,
-    titulo text not null,
-    textoExpediente text not null,
-    tituloSubGrupo text not null,
-    textoSubGrupo text not null,
-    constraint fk_sesion FOREIGN KEY(sesion_id) references sesion(id)
-);
+CREATE TABLE IF NOT EXISTS votacion (
+	id bigserial NOT NULL,
+	sesion_id int8 NOT NULL,
+	votacion_number int4 NOT NULL,
+	fecha date NOT NULL,
+	titulo text NOT NULL,
+	textoexpediente text NOT NULL,
+	titulosubgrupo text NOT NULL,
+	textosubgrupo text NOT NULL,
+	CONSTRAINT votacion_pkey PRIMARY KEY (id)
+	);
+ALTER TABLE votacion ADD CONSTRAINT fk_sesion FOREIGN KEY(sesion_id) references sesion(sesion_number);
+
 CREATE TABLE IF NOT EXISTS votos_resumido(
-    id serial primary key,
-    votacion_id int not null,
-    grupo text not null,
-    a_favor int not null,
-    en_contra int not null,
-    abstencion int not null,
-    nsnc int not null,
-    constraint fk_votacion FOREIGN KEY (votacion_id) references votacion(id)
+	id bigserial NOT NULL,
+	votacion_id int8 NOT NULL,
+	grupo text NOT NULL,
+	a_favor text NOT NULL,
+	en_contra text NOT NULL,
+	abstencion text NOT NULL,
+	nsnc text NOT NULL,
+	CONSTRAINT votos_resumido_pkey PRIMARY KEY (id)
 );
+ALTER TABLE public.votos_resumido ADD CONSTRAINT fk_votacion_resumida FOREIGN KEY (votacion_id) REFERENCES public.votacion(id);
 
 CREATE TABLE IF NOT EXISTS votos_detallado(
-    id serial primary key,
-    votacion_id int not null,
-    asiento int,
-    diputado text not null,
-    grupo text not null,
-    voto text not null,
-    constraint fk_votacion FOREIGN KEY (votacion_id) references votacion(id)
+	id bigserial NOT NULL,
+	votacion_id int8 NOT NULL,
+	asiento int4 NULL,
+	diputado text NOT NULL,
+	grupo text NOT NULL,
+	voto text NOT NULL,
+	CONSTRAINT votos_detallado_pkey PRIMARY KEY (id)
 );
+ALTER TABLE votos_detallado ADD CONSTRAINT fk_votacion FOREIGN KEY (votacion_id) REFERENCES public.votacion(id);
 

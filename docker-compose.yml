@@ -11,17 +11,17 @@ services:
       - POSTGRES_PASSWORD=test1
     ports:
       - '5432:5432'
-  mongodb:
-    #    TODO Use proper pwd handling
-    image: mongo:4.4.6
-    ports:
-      - 27017:27017
-    restart: unless-stopped
-    container_name: mongodb
-    environment:
-      - MONGO_INITDB_ROOT_USERNAME=test
-      - MONGO_INITDB_ROOT_PASSWORD=test1
-    volumes:
-      - ~/volumes/scrapper:/data/db
+#  mongodb:
+#    #    TODO Use proper pwd handling
+#    image: mongo:4.4.6
+#    ports:
+#      - 27017:27017
+#    restart: unless-stopped
+#    container_name: mongodb
+#    environment:
+#      - MONGO_INITDB_ROOT_USERNAME=test
+#      - MONGO_INITDB_ROOT_PASSWORD=test1
+#    volumes:
+#      - ~/volumes/scrapper:/data/db
 volumes:
   dbdata:

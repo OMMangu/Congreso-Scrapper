@@ -25,11 +25,18 @@ VALUES(%s, %s, to_date(%s, 'DD-MM-YY'), %s, %s, %s, %s) RETURNING id;
 SESSION_QUERY = """
 INSERT INTO public.sesion
 (sesion_number)
-VALUES(%s) RETURNING id;
+VALUES(%s)
+ON CONFLICT(sesion_number) DO NOTHING
+;
 """
 PRESENT_QUERY = """
 SELECT COUNT(*) FROM public.sesion s, public.votacion v 
 where s.sesion_number = %s and v.votacion_number = %s and v.titulo = %s;
+"""
+SIMILAR_QUERY = """
+select vot.id , vot.fecha, vot.titulo , vr.grupo, vr.a_favor, vr.en_contra , vr.abstencion , 
+vr.nsnc from public.votos_resumido vr inner join public.votacion vot on vr.votacion_id = vot.id where vr.grupo = %s 
+or vr.grupo = %s or vr.grupo = %s; 
 """
 
 
@@ -68,18 +75,12 @@ class PostgreDB(DbConnection):
             if row[0] == 0:
                 return False
             return True
-        # cursor.execute("select * from public.votes votes where votes.title = %s and votes.subtitle = %s and "
-        #                "votes.date_vote = %s;", (vote.title, vote.sub_title, vote.date))
-        # row = cursor.fetchone()
-        # if row is not None:
-        #     return True
 
     def insert(self, vote: Vote):
         with self.conn.cursor() as cursor:
             cursor.execute(SESSION_QUERY, [vote.session])
-            session_id = cursor.fetchone()[0]
             cursor.execute(VOTING_QUERY,
-                           [session_id, vote.num_vote, vote.date, vote.title, vote.record_text, vote.sub_title,
+                           [vote.session, vote.num_vote, vote.date, vote.title, vote.record_text, vote.sub_title,
                             vote.sub_group])
             vote_id = cursor.fetchone()[0]
             insert_summarised(cursor, vote, vote_id)
@@ -87,5 +88,8 @@ class PostgreDB(DbConnection):
             self.conn.commit()
         return True
 
-    def check_db_exists(self):
-        return True
+    def get_similar_votes(self, group_a, group_b, group_c):
+        with self.conn.cursor() as cursor:
+            cursor.execute(SIMILAR_QUERY, (group_a, group_b, group_c))
+            # vot.id, vot.date, vot.title, vot.group, vot.favor, vot.against, vot.abst, vot.nsnc
+            return cursor.fetchall()

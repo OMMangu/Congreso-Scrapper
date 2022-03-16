@@ -22,3 +22,7 @@ class DbConnection(ABC):
     @abstractmethod
     def insert(self, vote: Vote):
         pass
+
+    @abstractmethod
+    def get_similar_votes(self, group_a, group_b, group_c):
+        pass
