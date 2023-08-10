@@ -19,24 +19,26 @@ VALUES %s;
 """
 VOTING_QUERY = """
 INSERT INTO public.votacion
-(sesion_id, votacion_number, fecha, titulo, textoexpediente, titulosubgrupo, textosubgrupo)
-VALUES(%s, %s, to_date(%s, 'DD-MM-YY'), %s, %s, %s, %s) RETURNING id;
+(sesion_id, votacion_number, legislatura, fecha, titulo, textoexpediente, titulosubgrupo, textosubgrupo)
+VALUES(%s, %s, %s, to_date(%s, 'DD-MM-YY'), %s, %s, %s, %s) RETURNING id;
 """
 SESSION_QUERY = """
 INSERT INTO public.sesion
-(sesion_number)
-VALUES(%s)
-ON CONFLICT(sesion_number) DO NOTHING
+(sesion_number, legislatura)
+VALUES(%s, %s)
+ON CONFLICT(sesion_number, legislatura) DO NOTHING
 ;
 """
-PRESENT_QUERY = """
-SELECT COUNT(*) FROM public.sesion s, public.votacion v 
-where s.sesion_number = %s and v.votacion_number = %s and v.titulo = %s;
-"""
+PRESENT_QUERY = """SELECT COUNT(*) FROM public.sesion s, public.votacion v where s.sesion_number = %s and 
+s.legislatura = %s and v.votacion_number = %s and v.titulo = %s and v.votacion_number = %s and v.fecha = to_date(%s, 
+'DD-MM-YY'); """
 SIMILAR_QUERY = """
 select vot.id , vot.fecha, vot.titulo , vr.grupo, vr.a_favor, vr.en_contra , vr.abstencion , 
 vr.nsnc from public.votos_resumido vr inner join public.votacion vot on vr.votacion_id = vot.id where vr.grupo = %s 
 or vr.grupo = %s or vr.grupo = %s; 
+"""
+LEGISLATURA_QUERY = """
+SELECT id, nombre, inicio, fin FROM public.legislatura order by inicio desc;
 """
 
 
@@ -70,7 +72,8 @@ class PostgreDB(DbConnection):
 
     def title_is_present(self, vote):
         with self.conn.cursor() as cursor:
-            cursor.execute(PRESENT_QUERY, (vote.session, vote.num_vote, vote.title))
+            cursor.execute(PRESENT_QUERY,
+                           (vote.session, vote.legislatura, vote.num_vote, vote.title, vote.num_vote, vote.date))
             row = cursor.fetchone()
             if row[0] == 0:
                 return False
@@ -78,9 +81,10 @@ class PostgreDB(DbConnection):
 
     def insert(self, vote: Vote):
         with self.conn.cursor() as cursor:
-            cursor.execute(SESSION_QUERY, [vote.session])
+            cursor.execute(SESSION_QUERY, [vote.session, vote.legislatura])
             cursor.execute(VOTING_QUERY,
-                           [vote.session, vote.num_vote, vote.date, vote.title, vote.record_text, vote.sub_title,
+                           [vote.session, vote.num_vote, vote.legislatura, vote.date, vote.title, vote.record_text,
+                            vote.sub_title,
                             vote.sub_group])
             vote_id = cursor.fetchone()[0]
             insert_summarised(cursor, vote, vote_id)
@@ -92,4 +96,9 @@ class PostgreDB(DbConnection):
         with self.conn.cursor() as cursor:
             cursor.execute(SIMILAR_QUERY, (group_a, group_b, group_c))
             # vot.id, vot.date, vot.title, vot.group, vot.favor, vot.against, vot.abst, vot.nsnc
+            return cursor.fetchall()
+
+    def get_legislaturas(self):
+        with self.conn.cursor() as cursor:
+            cursor.execute(LEGISLATURA_QUERY)
             return cursor.fetchall()

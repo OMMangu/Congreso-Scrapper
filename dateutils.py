@@ -10,13 +10,13 @@ def format_date(date):
     return datetime.datetime.strptime(date, '%d/%m/%Y').strftime('%d-%m-%Y')
 
 
-def is_final_date(d):
-    if d.day == 1 and d.month == 1 and d.year == 2019:
+def is_final_date(d, first_day):
+    if d.day == first_day.day and d.month == first_day.month and d.year == first_day.year:
         return True
     return False
 
 
-def update_dates(day):
+def update_dates(day, first_day):
     day = day - datetime.timedelta(days=1)
-    final_date = is_final_date(day)
+    final_date = is_final_date(day, first_day)
     return day, final_date

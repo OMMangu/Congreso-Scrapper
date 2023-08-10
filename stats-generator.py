@@ -11,7 +11,7 @@ def main():
     db = PostgreDB("localhost", "postgres", "postgres", "test1")
     for file in name_list:
         json_file = read_json(file)
-        vote = create(json_file)
+        vote = create(json_file, file)
         if db.title_is_present(vote):
             print("Skipping insert, votes for {title} are present".format(title=vote.title))
             continue

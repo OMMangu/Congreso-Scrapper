@@ -34,7 +34,7 @@ def get_votos(json_data):
 
 
 def get_title(json_data):
-    return __get_json_attribute(json_data, "textoExpediente")
+    return __get_json_attribute(json_data, "titulo")
 
 
 def get_subtitle(json_data):
@@ -63,3 +63,8 @@ def get_detailed_vote(json_data):
 
 def __get_json_attribute(json_data, attribute):
     return json_data["informacion"][attribute]
+
+
+def get_legislatura(filename: str):
+    # split './files_X\\sesion1votacion1.json' in files_X and then split in X
+    return filename.split("\\")[0].split("_")[-1]

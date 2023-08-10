@@ -3,8 +3,9 @@ import json
 import os
 import re
 import zipfile
+from itertools import chain
 
-import requests
+from requestutils import get_request_with_headers
 
 
 def read_json(name):
@@ -14,9 +15,11 @@ def read_json(name):
 
 
 def get_json_list():
-    path_list = [os.path.join(dirpath, filename) for dirpath, _, filenames in os.walk('./files') for filename in
+    paths = ['./files_X', './files_XI', './files_XII', './files_XIII', './files_XIV']
+    path_list = [os.path.join(dirpath, filename) for dirpath, _, filenames in
+                 chain.from_iterable(os.walk(path) for path in paths) for filename in
                  filenames if filename.endswith('.json')]
-    path_list.sort()
+    # path_list.sort()
     return path_list
 
 
@@ -25,11 +28,14 @@ def delete_zip(name):
         os.remove(name)
 
 
-def unzip_file(filename):
-    with zipfile.ZipFile(filename, "r") as zip_ref:
-        for info in zip_ref.infolist():
-            if re.match(r'.+\.json', info.filename):
-                zip_ref.extract(info, "files/")
+def unzip_file(filename, folder):
+    try:
+        with zipfile.ZipFile(filename, "r") as zip_ref:
+            for info in zip_ref.infolist():
+                if re.match(r'.+\.json', info.filename):
+                    zip_ref.extract(info, folder + "/")
+    except zipfile.BadZipFile:
+        print("Error with zip " + filename)
 
 
 def create_download_folder(folder):
@@ -41,7 +47,7 @@ def create_download_folder(folder):
 
 
 def get_zip(url, day, folder):
-    r = requests.get(url)
+    r = get_request_with_headers(url)
     name = "{folder}/{DD}-{MM}-{YY}".format(folder=folder, DD=day.day, MM=day.month, YY=day.year)
     if os.path.isfile(name):
         print("Skipping {name}, already downloaded".format(name=name))

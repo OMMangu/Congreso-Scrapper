@@ -26,3 +26,7 @@ class DbConnection(ABC):
     @abstractmethod
     def get_similar_votes(self, group_a, group_b, group_c):
         pass
+
+    @abstractmethod
+    def get_legislaturas(self):
+        pass

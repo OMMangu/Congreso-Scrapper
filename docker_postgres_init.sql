@@ -2,6 +2,13 @@ CREATE TABLE IF NOT EXISTS sesion(
     id serial primary key,
     sesion_number int8 UNIQUE
 );
+CREATE TABLE IF NOT EXISTS legislatura(
+    id serial primary key,
+    nombre text not null unique,
+    inicio date not null,
+    fin date,
+    constraint legislatura_pkey primary key(id)
+);
 CREATE TABLE IF NOT EXISTS votacion (
 	id bigserial NOT NULL,
 	sesion_id int8 NOT NULL,
